@@ -7,7 +7,8 @@ fn main() {
     let account = SmartAccount {
         account_type: AccountType::Safe7579,
         is_initialized: true,
-        address: Address::from([0x42; 20]),
+        address: None,
+        execution_cache: None,
     };
 
     let execution = account.encode_execution(vec![Execution {
@@ -20,6 +21,8 @@ fn main() {
         value: U256::from(0),
         callData: Bytes::from([0x42; 20]),
     }
+
+    account.execution_cache = Some(execution);
 
     ]);
     println!("{:?}", execution);

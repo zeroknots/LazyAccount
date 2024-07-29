@@ -3,6 +3,7 @@ use alloy_primitives::{keccak256, Address, Bytes, B256, U256};
 use alloy_sol_types::{abi, sol};
 use alloy_sol_types::{sol_data::*, SolValue};
 
+use std::fmt;
 use std::error::Error;
 
 sol! {
@@ -22,6 +23,7 @@ struct PackedUserOperation {
 
 sol! {
 
+#[derive(Debug, PartialEq, Eq)]
 type ModeCode is bytes32;
 
 type CallType is bytes1;
@@ -69,9 +71,13 @@ contract ERC7579Account {
 }
 }
 
-pub const SINGLE_EXECUTION_MODE: alloy_primitives::FixedBytes<32> = alloy_primitives::FixedBytes([0x00; 32]);
-pub const BATCH_EXECUTION_MODE: alloy_primitives::FixedBytes<32> = alloy_primitives::FixedBytes([0x01; 32]);
 
+pub const SINGLE_EXECUTION_MODE: ModeCode = ModeCode(alloy_primitives::FixedBytes([0x00; 32]));
+pub const BATCH_EXECUTION_MODE: ModeCode= ModeCode({
+    let mut bytes = [0x00; 32];
+        bytes[0] = 0x01;
+        alloy_primitives::FixedBytes(bytes)
+    });
 
 
 
