@@ -1,5 +1,5 @@
 use alloy_contract::SolCallBuilder;
-use alloy_primitives::{address, keccak256, Address, Bytes, B256, U256};
+use alloy_primitives::{address, keccak256, Address, Bytes, b256, B256, U256};
 use alloy_provider::Provider;
 use alloy_sol_types::{sol_data::*, SolInterface};
 use alloy_sol_types::{abi, sol};
@@ -105,9 +105,9 @@ impl PackedUserOperation {
             nonce: U256::from(0),
             initCode: Bytes::default(),
             callData: Bytes::default(),
-            accountGasLimits: B256::default(),
-            preVerificationGas: U256::from(0),
-            gasFees: B256::default(),
+            accountGasLimits: b256!("0000000000000000000000000000000000000000000000000000000000000010"),
+            preVerificationGas: U256::from(100000),
+            gasFees: b256!("0000000000000000000000000000000000000000000000000000000000000010"),
             paymasterAndData: Bytes::default(),
             signature: Bytes::default(),
         }

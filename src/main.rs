@@ -58,7 +58,7 @@ async fn run(config: Config) -> Result<(), Box<dyn StdError>> {
 
     println!("{:?}", execution);
 
-    let validator_module: Address = address!("69Eaf29639943be24f1A66c2dAeAa3128F5db380");
+    let validator_module: Address = address!("903Da2DD182Ea1C962f34282692AA51B81Dc8432");
 
     let userop = PackedUserOperation::new()
         .with_sender(account.address.expect("UserOp.sender missing"))

@@ -65,19 +65,9 @@ impl ExecutionHelper for SmartAccount {
 
         let calldata = ERC7579Account::executeCall {
             mode: mode.into(),
-            executionCalldata: Bytes::from(result),
+            executionCalldata: result.into(),
         };
-        println!("{:?}", calldata);
-        let foo = calldata.abi_encode();
-        println!("{:?}", foo);
-        Bytes::from(foo)
-
-        //
-        // // println!("{:?}", calldata.abi_encode_packed());
-        //
-        //
-        // let ret = ERC7579Account::ERC7579AccountCalls::execute(calldata);
-        // ret
+        Bytes::from(calldata.abi_encode())
     }
 
     fn install_module(
@@ -131,6 +121,7 @@ impl BaseAccount for SmartAccount {
             .getNonce(self.address.ok_or("No address")?, key)
             .call()
             .await?;
+        println!("Nonce: {:?}", nonce);
         Ok(nonce)
     }
 }
