@@ -1,2 +1,2 @@
-pub mod types;
 pub mod account;
+pub mod types;

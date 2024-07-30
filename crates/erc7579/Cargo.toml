@@ -5,6 +5,9 @@ edition = "2021"
 
 
 [dependencies]
+alloy-contract = { version = "0.2" }
+alloy-network = { version = "0.2"}
+alloy-provider = { version = "0.2"}
 alloy-primitives = {version = "0.7", features = ["serde"]}
 alloy-sol-types = { version = "0.7", features = ["json"] }
 alloy-signer = "0.2"
@@ -12,4 +15,5 @@ alloy-signer-local = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 clap = { version = "4.3", features = ["derive"] }
-
+tokio = { version= "1.38", features = ["rt-multi-thread", "macros"] }
+async-trait = "0.1.81"
