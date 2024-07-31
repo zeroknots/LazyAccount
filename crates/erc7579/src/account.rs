@@ -137,7 +137,8 @@ impl Bundler for SmartAccount {
     async fn send_user_op<T: Provider> (&self,userop:PackedUserOperation, provider:&T) -> Result<(), Box<dyn StdError>> { 
         let ep: Address = address!("0000000071727De22E5E9d8BAf0edAc6f37da032");
         let contract = EntryPoint::new(ep, provider);
-        let EntryPoint::handleOpsReturn {} = contract.handleOps(vec![userop], ep).call().await?;
+        let tx_hash = contract.handleOps(vec![userop], ep).send().await?.watch().await?;
+
         Ok(())
 
     }

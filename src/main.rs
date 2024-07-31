@@ -1,7 +1,8 @@
 use alloy_contract::SolCallBuilder;
-use alloy_network::Ethereum;
+use alloy_network::{EthereumWallet};
 use alloy_primitives::{address, keccak256, Address, Bytes, FixedBytes, B256, U256};
 use alloy_provider::ProviderBuilder;
+use alloy_signer_local::PrivateKeySigner;
 use erc7579::account::*;
 use erc7579::types::*;
 use std::error::Error as StdError;
@@ -17,6 +18,8 @@ struct Args {
     /// Path to the JSON input file
     #[arg(short, long)]
     config: PathBuf,
+    #[arg(short, long)]
+    private_key: String,
 }
 
 #[tokio::main]
@@ -24,10 +27,10 @@ async fn main() -> Result<(), Box<dyn StdError>> {
     let args = Args::parse();
     let config = parse_config(args.config).unwrap();
 
-    run(config).await
+    run(config, args.private_key).await
 }
 
-async fn run(config: Config) -> Result<(), Box<dyn StdError>> {
+async fn run(config: Config, priv_key:String) -> Result<(), Box<dyn StdError>> {
     // Your async code here
     //
     println!("Hello LazyAccount");
@@ -40,11 +43,20 @@ async fn run(config: Config) -> Result<(), Box<dyn StdError>> {
         validators: None,
     };
 
+
+    let signer = PrivateKeySigner::from_str(&priv_key)?;
+    let wallet = EthereumWallet::from(signer);
+
+
+    let rpc_url = "http://localhost:8545";
     // Create a provider with the HTTP transport using the `reqwest` crate.
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
-        .on_builtin("http://localhost:8545")
-        .await?;
+        .wallet(wallet.clone())
+        .on_http(rpc_url.parse()?);
+
+    println!("{:?}", provider);
+
 
     // account.address = Address::from([0x40; 20]).into();
 
@@ -62,12 +74,12 @@ async fn run(config: Config) -> Result<(), Box<dyn StdError>> {
 
     let userop = PackedUserOperation::new()
         .with_sender(account.address.expect("UserOp.sender missing"))
-        .with_nonce(account.get_nonce(&provider, validator_module).await?)
+        .with_nonce(account.get_nonce(&provider.clone(), validator_module).await?)
         .with_signature(Bytes::from([0x40; 20]))
         .with_calldata(execution);
     println!("{:?}", userop);
 
-    account.send_user_op(userop, &provider.clone()).await?;
+    account.send_user_op(userop, provider.clone()).await?;
 
     Ok(())
 }
