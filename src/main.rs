@@ -57,7 +57,6 @@ async fn run(config: Config, priv_key:String) -> Result<(), Box<dyn StdError>> {
 
     println!("{:?}", provider);
 
-
     // account.address = Address::from([0x40; 20]).into();
 
     let execution = account.encode_execution(vec![
@@ -72,14 +71,27 @@ async fn run(config: Config, priv_key:String) -> Result<(), Box<dyn StdError>> {
 
     let validator_module: Address = address!("903Da2DD182Ea1C962f34282692AA51B81Dc8432");
 
+    let mut key_bytes = [0u8; 32];
+    key_bytes[12..32].copy_from_slice(&validator_module.as_slice());
+    let key = U256::from_be_bytes(key_bytes);
+    // Truncate to 192 bits (24 bytes)
+    let key = key & (U256::MAX >> 64); // Equivalent to uint192 in Solidity
+    let ep: Address = address!("0000000071727De22E5E9d8BAf0edAc6f37da032");
+    let contract = EntryPoint::new(ep, provider);
+    let EntryPoint::getNonceReturn { nonce } = contract
+        .getNonce(account.address.ok_or("No address")?, key)
+        .call()
+        .await?;
+    println!("Nonce: {:?}", nonce);
+
     let userop = PackedUserOperation::new()
         .with_sender(account.address.expect("UserOp.sender missing"))
-        .with_nonce(account.get_nonce(&provider.clone(), validator_module).await?)
+        .with_nonce(nonce)
         .with_signature(Bytes::from([0x40; 20]))
         .with_calldata(execution);
     println!("{:?}", userop);
 
-    account.send_user_op(userop, provider.clone()).await?;
+    // account.send_user_op(userop, &provider.clone()).await?;
 
     Ok(())
 }
